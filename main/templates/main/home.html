@@ -1,0 +1,161 @@
+{% extends "main/base.html" %}
+{% load static %}
+
+{% block content %}
+
+<link href="https://unpkg.com/aos@2.3.4/dist/aos.css" rel="stylesheet">
+
+<section class="hero min-vh-100 d-flex align-items-center">
+    <div class="container text-center">
+        <h1 data-aos="fade-up" class="display-2 fw-bold mb-4">
+            SmartHomeApp
+        </h1>
+
+        <p data-aos="fade-up" data-aos-delay="200" class="lead text-muted mb-4">
+            A Django-powered smart home dashboard running on a Raspberry Pi.
+            Monitor devices, automate routines, and take full control of your home.
+        </p>
+
+        <div data-aos="fade-up" data-aos-delay="400">
+            <a href="#features" class="btn btn-primary btn-lg px-5">
+                Explore Features
+            </a>
+        </div>
+    </div>
+</section>
+
+<section id="features" class="py-5">
+    <div class="container">
+        <div class="text-center mb-5">
+            <h2 data-aos="fade-up">Features</h2>
+            <p data-aos="fade-up" data-aos-delay="100">
+                Everything you need for a modern self-hosted smart home.
+            </p>
+        </div>
+
+        <div class="row g-4">
+
+            <div class="col-md-4" data-aos="fade-up">
+                <div class="card h-100 shadow-sm border-0">
+                    <div class="card-body">
+                        <h4>🏠 Device Control</h4>
+                        <p>
+                            Manage all connected devices from a single dashboard.
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-4" data-aos="fade-up" data-aos-delay="150">
+                <div class="card h-100 shadow-sm border-0">
+                    <div class="card-body">
+                        <h4>⚡ Automations</h4>
+                        <p>
+                            Create smart routines and automate everyday tasks.
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-4" data-aos="fade-up" data-aos-delay="300">
+                <div class="card h-100 shadow-sm border-0">
+                    <div class="card-body">
+                        <h4>🔒 Self Hosted</h4>
+                        <p>
+                            Runs locally on your Raspberry Pi with complete data ownership.
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</section>
+
+<section class="py-5 bg-dark text-white">
+    <div class="container text-center">
+
+        <h2 data-aos="zoom-in" class="mb-5">
+            Built on Raspberry Pi
+        </h2>
+
+        <div class="row">
+
+            <div class="col-md-4" data-aos="fade-up">
+                <h1 class="display-4 fw-bold">24/7</h1>
+                <p>Always Available</p>
+            </div>
+
+            <div class="col-md-4" data-aos="fade-up" data-aos-delay="150">
+                <h1 class="display-4 fw-bold">100%</h1>
+                <p>Your Data</p>
+            </div>
+
+            <div class="col-md-4" data-aos="fade-up" data-aos-delay="300">
+                <h1 class="display-4 fw-bold">∞</h1>
+                <p>Customization</p>
+            </div>
+
+        </div>
+
+    </div>
+</section>
+
+<section class="py-5">
+    <div class="container text-center">
+
+        <h2 data-aos="fade-up">
+            Open Source Smart Home Platform
+        </h2>
+
+        <p data-aos="fade-up" data-aos-delay="150" class="lead mt-3">
+            Built with Django, powered by Raspberry Pi, designed for makers.
+        </p>
+
+        <a data-aos="fade-up"
+           data-aos-delay="300"
+           href="#"
+           class="btn btn-outline-primary btn-lg mt-4">
+            View on GitHub
+        </a>
+
+    </div>
+</section>
+
+<script src="https://unpkg.com/aos@2.3.4/dist/aos.js"></script>
+
+<script>
+    AOS.init({
+        duration: 1000,
+        once: true
+    });
+</script>
+
+<style>
+.hero{
+    background:
+        radial-gradient(circle at top right,
+        rgba(13,110,253,.2),
+        transparent 40%),
+        #0f172a;
+    color:white;
+}
+
+.card{
+    transition:.3s ease;
+}
+
+.card:hover{
+    transform:translateY(-10px);
+}
+
+.btn{
+    transition:.3s ease;
+}
+
+.btn:hover{
+    transform:translateY(-3px);
+}
+</style>
+
+{% endblock %}
