@@ -1,1 +1,1 @@
-web: gunicorn jerseystore.wsgi
+web: gunicorn config.wsgi
