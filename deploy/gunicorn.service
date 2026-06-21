@@ -1,0 +1,15 @@
+[Unit]
+Description=Gunicorn for SmartHomeApp
+After=network.target
+
+[Service]
+Type=simple
+User=siannn
+Group=siannn
+WorkingDirectory=/home/siannn/Desktop/SmartHomeApp
+EnvironmentFile=/home/siannn/Desktop/SmartHomeApp/.env
+ExecStart=/home/siannn/Desktop/SmartHomeApp/venv/bin/gunicorn config.wsgi --config gunicorn.conf.py
+Restart=always
+
+[Install]
+WantedBy=multi-user.target
