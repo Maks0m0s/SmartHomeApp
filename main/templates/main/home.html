@@ -11,14 +11,13 @@
             SmartHomeApp
         </h1>
 
-        <p data-aos="fade-up" data-aos-delay="200" class="lead text-muted mb-4">
+        <p data-aos="fade-up" data-aos-delay="200" class="lead mb-4">
             A Django-powered smart home dashboard running on a Raspberry Pi.
-            Monitor devices, automate routines, and take full control of your home.
         </p>
 
         <div data-aos="fade-up" data-aos-delay="400">
-            <a href="#features" class="btn btn-primary btn-lg px-5">
-                Explore Features
+            <a href="{% url 'device-dashboard' %}" class="btn btn-primary btn-lg px-5">
+                Dashboard
             </a>
         </div>
     </div>
@@ -114,7 +113,7 @@
 
         <a data-aos="fade-up"
            data-aos-delay="300"
-           href="#"
+           href="https://github.com/Maks0m0s/SmartHomeApp/"
            class="btn btn-outline-primary btn-lg mt-4">
             View on GitHub
         </a>
