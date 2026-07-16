@@ -1,0 +1,494 @@
+{% extends "main/base.html" %}
+{% load static %}
+
+{% block title %}SmartHome — Dashboard{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4 px-3 px-xl-4" style="height:calc(100vh - 80px);">
+
+  <div class="row g-3 h-100">
+
+    <!-- LEFT PANEL -->
+    <div class="col-12 col-md-5 col-lg-4 d-flex flex-column" style="height:100%;">
+
+      <!-- Category Tabs -->
+      <div class="glass p-2 d-flex gap-2 mb-3 flex-shrink-0">
+        <button class="tab-btn active flex-fill py-3 px-3 rounded-3 border-0 fw-semibold text-center"
+                data-category="floors"
+                style="transition:.2s;background:rgba(59,130,246,.2);color:var(--primary);">
+          <i class="bi bi-layers me-2"></i>Floors
+        </button>
+        <button class="tab-btn flex-fill py-3 px-3 rounded-3 border-0 fw-semibold text-center"
+                data-category="person"
+                style="transition:.2s;background:transparent;color:var(--muted);">
+          <i class="bi bi-people me-2"></i>Person
+        </button>
+        <button class="tab-btn flex-fill py-3 px-3 rounded-3 border-0 fw-semibold text-center"
+                data-category="state"
+                style="transition:.2s;background:transparent;color:var(--muted);">
+          <i class="bi bi-activity me-2"></i>State
+        </button>
+        {% if user.is_authenticated and user.is_staff %}
+        <a href="/admin/main/device/add/"
+           class="btn btn-outline-primary d-flex align-items-center justify-content-center flex-shrink-0 px-3 py-3 rounded-3 border-0 fw-semibold"
+           style="background:transparent;color:var(--primary);gap:6px;">
+          <i class="bi bi-plus-lg"></i>
+          <span class="d-none d-sm-inline">Add</span>
+        </a>
+        {% endif %}
+      </div>
+
+      <!-- Category Content -->
+      <div class="glass p-3 flex-grow-1" style="overflow-y:auto;min-height:0;">
+
+        <!-- FLOORS -->
+        <div class="category-content" data-category="floors">
+          <h6 class="text-body-secondary text-uppercase small fw-semibold mb-3">
+            <i class="bi bi-layers me-1"></i> Select Floor
+          </h6>
+          <div class="d-flex flex-column gap-2">
+            {% for floor in floors %}
+            <div class="floor-card selectable-card rounded-3 p-3"
+                 data-id="{{ floor.id }}"
+                 data-url="{% url 'floor-rooms' floor.id %}"
+                 style="cursor:pointer;transition:.2s;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);">
+              <div class="d-flex align-items-center gap-3">
+                <div class="d-flex align-items-center justify-content-center rounded-2 flex-shrink-0"
+                     style="width:44px;height:44px;background:rgba(59,130,246,.15);">
+                  <i class="bi bi-building text-primary" style="font-size:1.2rem;"></i>
+                </div>
+                <div>
+                  <div class="fw-semibold">{{ floor.name }}</div>
+                  <small class="text-body-secondary">{{ floor.rooms.count }} rooms</small>
+                </div>
+                <i class="bi bi-chevron-right ms-auto text-body-secondary"></i>
+              </div>
+            </div>
+            {% empty %}
+            <div class="text-center py-4">
+              <i class="bi bi-building-slash fs-2 text-body-secondary"></i>
+              <p class="text-body-secondary small mt-2">No floors configured</p>
+            </div>
+            {% endfor %}
+          </div>
+
+          <!-- Sub-items: Rooms (shown after floor click) -->
+          <div id="room-list" class="mt-3 d-none">
+            <hr class="border-secondary border-opacity-25">
+            <h6 class="text-body-secondary text-uppercase small fw-semibold mb-3">
+              <i class="bi bi-door-open me-1"></i> Select Room
+            </h6>
+            <div id="room-list-inner" class="d-flex flex-column gap-2"></div>
+          </div>
+        </div>
+
+        <!-- PERSON -->
+        <div class="category-content d-none" data-category="person">
+          <h6 class="text-body-secondary text-uppercase small fw-semibold mb-3">
+            <i class="bi bi-people me-1"></i> Select Person
+          </h6>
+          <div class="d-flex flex-column gap-2">
+            {% for user in users %}
+            <div class="user-card selectable-card rounded-3 p-3"
+                 data-id="{{ user.id }}"
+                 data-url="{% url 'user-devices' user.id %}"
+                 style="cursor:pointer;transition:.2s;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);">
+              <div class="d-flex align-items-center gap-3">
+                <div class="d-flex align-items-center justify-content-center rounded-2 flex-shrink-0"
+                     style="width:44px;height:44px;background:rgba(99,102,241,.15);">
+                  <i class="bi bi-person-circle text-primary" style="font-size:1.2rem;"></i>
+                </div>
+                <div>
+                  <div class="fw-semibold">{{ user.get_full_name|default:user.username }}</div>
+                  <small class="text-body-secondary">{{ user.devices.count }} devices</small>
+                </div>
+                <i class="bi bi-chevron-right ms-auto text-body-secondary"></i>
+              </div>
+            </div>
+            {% empty %}
+            <div class="text-center py-4">
+              <i class="bi bi-people-slash fs-2 text-body-secondary"></i>
+              <p class="text-body-secondary small mt-2">No users found</p>
+            </div>
+            {% endfor %}
+          </div>
+        </div>
+
+        <!-- STATE -->
+        <div class="category-content d-none" data-category="state">
+          <h6 class="text-body-secondary text-uppercase small fw-semibold mb-3">
+            <i class="bi bi-activity me-1"></i> Select State
+          </h6>
+          <div class="d-flex flex-column gap-2">
+            <div class="state-card selectable-card rounded-3 p-3"
+                 data-state="active"
+                 data-url="{% url 'state-devices' 'active' %}"
+                 style="cursor:pointer;transition:.2s;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);">
+              <div class="d-flex align-items-center gap-3">
+                <div class="d-flex align-items-center justify-content-center rounded-2 flex-shrink-0"
+                     style="width:44px;height:44px;background:rgba(34,197,94,.15);">
+                  <i class="bi bi-check-circle text-success" style="font-size:1.2rem;"></i>
+                </div>
+                <div>
+                  <div class="fw-semibold">Active</div>
+                  <small class="text-body-secondary">{{ active_count|default:"0" }} devices</small>
+                </div>
+                <i class="bi bi-chevron-right ms-auto text-body-secondary"></i>
+              </div>
+            </div>
+            <div class="state-card selectable-card rounded-3 p-3"
+                 data-state="stopped"
+                 data-url="{% url 'state-devices' 'stopped' %}"
+                 style="cursor:pointer;transition:.2s;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);">
+              <div class="d-flex align-items-center gap-3">
+                <div class="d-flex align-items-center justify-content-center rounded-2 flex-shrink-0"
+                     style="width:44px;height:44px;background:rgba(239,68,68,.15);">
+                  <i class="bi bi-x-circle text-danger" style="font-size:1.2rem;"></i>
+                </div>
+                <div>
+                  <div class="fw-semibold">Stopped</div>
+                  <small class="text-body-secondary">{{ stopped_count|default:"0" }} devices</small>
+                </div>
+                <i class="bi bi-chevron-right ms-auto text-body-secondary"></i>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- RIGHT PANEL -->
+    <div class="col-12 col-md-7 col-lg-8 d-flex flex-column" style="height:100%;">
+
+      <!-- Panel Header -->
+      <div class="glass p-3 mb-3 d-flex align-items-center justify-content-between flex-shrink-0">
+        <div>
+          <h5 class="fw-bold mb-0" id="right-panel-title">
+            <i class="bi bi-grid-3x3-gap-fill me-2"></i>Devices
+          </h5>
+          <small class="text-body-secondary" id="right-panel-subtitle">Select a category to view devices</small>
+        </div>
+        <div class="d-flex align-items-center gap-2">
+          <span class="badge bg-primary bg-opacity-10 text-primary px-3 py-2" id="device-count-badge">
+            {{ devices|length }} device{{ devices|length|pluralize }}
+          </span>
+          {% if user.is_authenticated and user.is_staff %}
+            <a href="/admin/main/device/" class="btn btn-outline-primary d-flex align-items-center gap-1 rounded-2 py-2 px-3">
+            <i class="bi bi-gear"></i> <span class="d-none d-sm-inline">Manage</span>
+            </a>
+          {% else %}
+            <button class="btn btn-outline-secondary d-flex align-items-center gap-1 rounded-2 py-2 px-3" disabled data-bs-toggle="tooltip" title="Staff access required">
+              <i class="bi bi-gear me-1"></i>Manage
+            </button>
+          {% endif %}
+        </div>
+      </div>
+
+      <!-- Device Grid -->
+      <div class="glass p-3 p-md-4 flex-grow-1" style="overflow-y:auto;min-height:0;">
+        <div class="row g-3" id="device-grid">
+          {% for device in devices %}
+          <div class="col-6 col-lg-4 col-xl-3">
+            <div class="device-card rounded-3 p-0 h-100 d-flex flex-column"
+                 style="background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);overflow:hidden;">
+
+              <!-- Device Image -->
+              <div class="device-image d-flex align-items-center justify-content-center"
+                   style="height:140px;background:rgba(59,130,246,.08);">
+                <i class="bi bi-cpu" style="font-size:2.5rem;color:rgba(59,130,246,.4);"></i>
+              </div>
+
+              <!-- Device Info -->
+              <div class="p-3 d-flex flex-column align-items-center text-center flex-grow-1">
+                <h6 class="fw-semibold mb-2 text-truncate w-100">{{ device.name }}</h6>
+
+                {% if device.is_active %}
+                <span class="badge bg-success bg-opacity-10 text-success px-3 py-1 mb-3">
+                  <span class="d-inline-block rounded-circle bg-success me-1" style="width:6px;height:6px;"></span>
+                  Active
+                </span>
+                {% else %}
+                <span class="badge bg-danger bg-opacity-10 text-danger px-3 py-1 mb-3">
+                  <span class="d-inline-block rounded-circle bg-danger me-1" style="width:6px;height:6px;"></span>
+                  Stopped
+                </span>
+                {% endif %}
+
+                <div class="mt-auto w-100 d-flex gap-2">
+                  {% if user.is_authenticated and user.is_staff %}
+                  <button type="button"
+                          class="connect-btn btn btn-outline-primary flex-fill btn-sm rounded-2 py-2"
+                          data-url="http://{{ device.ip_address }}:{{ device.port }}">
+                    <i class="bi bi-box-arrow-up-right me-1"></i>Connect
+                  </button>
+                  <a href="/admin/main/device/{{ device.id }}/change/"
+                     class="btn btn-outline-secondary flex-fill btn-sm rounded-2 py-2">
+                    <i class="bi bi-gear me-1"></i>Manage
+                  </a>
+                  {% else %}
+                  <button class="btn btn-outline-secondary flex-fill btn-sm rounded-2 py-2" disabled
+                          data-bs-toggle="tooltip" title="Sign in to connect">
+                    <i class="bi bi-box-arrow-up-right me-1"></i>Connect
+                  </button>
+                  <button class="btn btn-outline-secondary flex-fill btn-sm rounded-2 py-2" disabled
+                          data-bs-toggle="tooltip" title="Sign in to manage">
+                    <i class="bi bi-gear me-1"></i>Manage
+                  </button>
+                  {% endif %}
+                </div>
+              </div>
+
+            </div>
+          </div>
+          {% empty %}
+          <div class="col-12">
+            <div class="text-center py-5">
+              <i class="bi bi-wifi-off fs-1 text-body-secondary"></i>
+              <p class="text-body-secondary mt-3" id="empty-device-msg">
+                Select a floor, person, or state to see devices
+              </p>
+            </div>
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+</div>
+
+<!-- Device iframe overlay -->
+<div id="device-view" style="display:none;position:fixed;inset:0;z-index:1050;background:var(--bg);">
+  <div style="display:flex;align-items:center;gap:8px;padding:10px 12px;background:rgba(15,23,42,.95);backdrop-filter:blur(12px);border-bottom:1px solid rgba(255,255,255,.08);">
+    <button id="back-btn" class="btn btn-sm btn-outline-light d-flex align-items-center gap-1 flex-shrink-0">
+      <i class="bi bi-arrow-left"></i> <span class="d-none d-sm-inline">Back</span>
+    </button>
+    <span id="device-url-label" class="small text-body-secondary text-truncate"></span>
+  </div>
+  <iframe id="device-frame" style="width:100%;height:calc(100vh - 45px);border:none;"></iframe>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+
+  const tabBtns = document.querySelectorAll('.tab-btn');
+  const contents = document.querySelectorAll('.category-content');
+  const roomListSection = document.getElementById('room-list');
+  const roomListInner = document.getElementById('room-list-inner');
+  const deviceGrid = document.getElementById('device-grid');
+  const deviceCountBadge = document.getElementById('device-count-badge');
+  const panelTitle = document.getElementById('right-panel-title');
+  const panelSubtitle = document.getElementById('right-panel-subtitle');
+  const deviceView = document.getElementById('device-view');
+  const deviceFrame = document.getElementById('device-frame');
+  const deviceLabel = document.getElementById('device-url-label');
+  const backBtn = document.getElementById('back-btn');
+
+  let activeCard = null;
+  let activeSubCard = null;
+
+  // ---- Tab switching ----
+  tabBtns.forEach(btn => {
+    btn.addEventListener('click', function () {
+      const category = this.dataset.category;
+
+      tabBtns.forEach(b => {
+        b.style.background = 'transparent';
+        b.style.color = 'var(--muted)';
+      });
+      this.style.background = 'rgba(59,130,246,.2)';
+      this.style.color = 'var(--primary)';
+
+      contents.forEach(c => c.classList.toggle('d-none', c.dataset.category !== category));
+      roomListSection.classList.add('d-none');
+      activeSubCard = null;
+    });
+  });
+
+  function deselectAll() {
+    document.querySelectorAll('.selectable-card').forEach(c => {
+      c.style.borderColor = 'rgba(255,255,255,.06)';
+      c.style.background = 'rgba(255,255,255,.03)';
+    });
+  }
+
+  function selectCard(card) {
+    deselectAll();
+    if (card) {
+      card.style.borderColor = 'var(--primary)';
+      card.style.background = 'rgba(59,130,246,.1)';
+    }
+  }
+
+  function updateDeviceGrid(html, title, subtitleText) {
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(html, 'text/html');
+    const newGrid = doc.getElementById('device-grid');
+
+    if (newGrid) {
+      deviceGrid.innerHTML = newGrid.innerHTML;
+      const count = newGrid.querySelectorAll('.device-card').length;
+      deviceCountBadge.textContent = count + ' device' + (count !== 1 ? 's' : '');
+      if (title) panelTitle.innerHTML = title;
+      if (subtitleText) panelSubtitle.textContent = subtitleText;
+    }
+    bindConnectButtons();
+  }
+
+  // ---- Load rooms for a floor ----
+  function loadRooms(floorId, floorName, floorCard) {
+    fetch('/dashboard/floors/' + floorId + '/rooms.json')
+      .then(r => r.json())
+      .then(data => {
+        roomListInner.innerHTML = '';
+        if (data.rooms && data.rooms.length) {
+          data.rooms.forEach(room => {
+            const el = document.createElement('div');
+            el.className = 'room-card selectable-card rounded-3 p-3';
+            el.dataset.id = room.id;
+            el.dataset.url = '/dashboard/floors/' + floorId + '/room/' + room.id + '/';
+            el.style.cssText = 'cursor:pointer;transition:.2s;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);';
+            el.innerHTML =
+              '<div class="d-flex align-items-center gap-3">' +
+                '<div class="d-flex align-items-center justify-content-center rounded-2 flex-shrink-0" style="width:44px;height:44px;background:rgba(16,185,129,.15);">' +
+                  '<i class="bi bi-door-open text-success" style="font-size:1.2rem;"></i>' +
+                '</div>' +
+                '<div>' +
+                  '<div class="fw-semibold">' + room.name + '</div>' +
+                  '<small class="text-body-secondary">' + room.device_count + ' devices</small>' +
+                '</div>' +
+                '<i class="bi bi-chevron-right ms-auto text-body-secondary"></i>' +
+              '</div>';
+            el.addEventListener('click', function (e) {
+              e.stopPropagation();
+              selectCard(el);
+              activeSubCard = el;
+              fetchRoomDevices(el.dataset.url, room.name);
+            });
+            roomListInner.appendChild(el);
+          });
+          roomListSection.classList.remove('d-none');
+        } else {
+          roomListSection.classList.add('d-none');
+        }
+      })
+      .catch(() => roomListSection.classList.add('d-none'));
+  }
+
+  function fetchRoomDevices(url, roomName) {
+    fetch(url)
+      .then(r => r.text())
+      .then(html => {
+        updateDeviceGrid(html,
+          '<i class="bi bi-door-open me-2"></i>' + roomName,
+          'Devices in ' + roomName
+        );
+      });
+  }
+
+  // ---- Selectable cards ----
+  document.querySelectorAll('.floor-card, .user-card, .state-card').forEach(card => {
+    card.addEventListener('click', function () {
+      selectCard(this);
+      activeCard = this;
+      activeSubCard = null;
+      roomListSection.classList.add('d-none');
+
+      const url = this.dataset.url;
+      if (!url) return;
+
+      const nameEl = this.querySelector('.fw-semibold');
+      const name = nameEl ? nameEl.textContent.trim() : '';
+
+      if (this.classList.contains('floor-card')) {
+        loadRooms(this.dataset.id, name, this);
+        updateDeviceGrid(
+          '{% for device in devices %}<div class="col-6 col-lg-4 col-xl-3">' +
+          '<div class="device-card rounded-3 p-0 h-100 d-flex flex-column" style="background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);overflow:hidden;">' +
+          '<div class="device-image d-flex align-items-center justify-content-center" style="height:140px;background:rgba(59,130,246,.08);">' +
+          '<i class="bi bi-building" style="font-size:2.5rem;color:rgba(59,130,246,.4);"></i></div>' +
+          '<div class="p-3 d-flex flex-column align-items-center text-center flex-grow-1">' +
+          '<h6 class="fw-semibold mb-2 text-truncate w-100">' + name + '</h6>' +
+          '<div class="mt-auto w-100"><button class="btn btn-outline-primary w-100 btn-sm rounded-2 py-2" disabled>' +
+          '<i class="bi bi-chevron-right me-1"></i>Select a room</button></div></div></div></div>' +
+          '{% endfor %}',
+          '<i class="bi bi-building me-2"></i>' + name,
+          'Select a room to view its devices'
+        );
+      } else {
+        fetch(url)
+          .then(r => r.text())
+          .then(html => {
+            updateDeviceGrid(html,
+              '<i class="bi bi-grid-3x3-gap-fill me-2"></i>' + name,
+              'Devices for ' + name
+            );
+          });
+      }
+    });
+  });
+
+  // ---- Connect buttons ----
+  function bindConnectButtons() {
+    document.querySelectorAll('.connect-btn').forEach(btn => {
+      btn.removeEventListener('click', connectHandler);
+      btn.addEventListener('click', connectHandler);
+    });
+  }
+
+  function connectHandler() {
+    deviceFrame.src = this.dataset.url;
+    deviceLabel.textContent = this.dataset.url;
+    deviceView.style.display = 'block';
+  }
+
+  backBtn.addEventListener('click', function () {
+    deviceFrame.src = '';
+    deviceView.style.display = 'none';
+  });
+
+  bindConnectButtons();
+
+});
+</script>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+  .tab-btn:focus { outline: none; }
+  .tab-btn:hover { opacity: .85; }
+
+  .selectable-card:hover {
+    border-color: rgba(59,130,246,.3) !important;
+    background: rgba(59,130,246,.06) !important;
+  }
+
+  .device-card {
+    transition: transform .2s, box-shadow .2s;
+  }
+  .device-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 24px rgba(0,0,0,.3);
+  }
+
+  .connect-btn, .connect-btn:hover, .connect-btn:focus {
+    outline: none !important;
+    box-shadow: none !important;
+  }
+
+  #room-list-inner, .category-content {
+    scrollbar-width: thin;
+  }
+
+  @media (max-width: 767.98px) {
+    .container-fluid { height: auto !important; }
+    .row.g-3.h-100 { height: auto !important; }
+    .col-12.col-md-5 { height: auto !important; max-height: 50vh; }
+    .col-12.col-md-7 { height: auto !important; }
+  }
+</style>
+{% endblock %}

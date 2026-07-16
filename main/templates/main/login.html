@@ -1,0 +1,49 @@
+{% extends "main/base.html" %}
+{% load static %}
+
+{% block title %}Sign In — SmartHome{% endblock %}
+
+{% block content %}
+<div class="min-vh-100 d-flex align-items-center justify-content-center" style="padding-top:60px;">
+  <div class="glass p-4 p-md-5" style="width:100%;max-width:420px;">
+
+    <div class="text-center mb-4">
+      <div class="d-inline-flex align-items-center justify-content-center rounded-3 mb-3"
+           style="width:56px;height:56px;background:rgba(59,130,246,.15);">
+        <i class="bi bi-shield-lock text-primary fs-4"></i>
+      </div>
+      <h4 class="fw-bold">Welcome Back</h4>
+      <p class="text-body-secondary small">Sign in to your account</p>
+    </div>
+
+    <form method="post" action="{% url 'login' %}">
+      {% csrf_token %}
+
+      {% if form.non_field_errors %}
+      <div class="alert alert-danger bg-danger bg-opacity-10 text-danger border-0 small py-2">
+        {% for error in form.non_field_errors %}{{ error }}{% endfor %}
+      </div>
+      {% endif %}
+
+      <div class="mb-3">
+        <label class="form-label small fw-semibold text-body-secondary">Username</label>
+        {{ form.username }}
+      </div>
+
+      <div class="mb-4">
+        <label class="form-label small fw-semibold text-body-secondary">Password</label>
+        {{ form.password }}
+      </div>
+
+      <button type="submit" class="btn btn-primary w-100 py-2 fw-semibold">
+        <i class="bi bi-box-arrow-in-right me-1"></i> Sign In
+      </button>
+    </form>
+
+    <p class="text-center text-body-secondary small mt-4 mb-0">
+      Don't have an account?
+      <a href="{% url 'register' %}" class="text-primary text-decoration-none fw-semibold">Register</a>
+    </p>
+  </div>
+</div>
+{% endblock %}
