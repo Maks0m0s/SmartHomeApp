@@ -13,7 +13,7 @@ class DeviceDashboardView(viewsets.ViewSet):
     template_name = "main/devices.html"
 
     def list(self, request):
-        devices = Device.objects.filter(is_active=True)
+        devices = Device.objects.all()
         context = {"devices": devices}
 
         return Response(context)
