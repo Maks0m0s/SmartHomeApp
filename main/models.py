@@ -8,6 +8,7 @@ class Device(models.Model):
     description = models.TextField(blank=True)
     is_active = models.BooleanField(default=True)
     creator = models.ForeignKey(User,  related_name="devices", on_delete=models.CASCADE, null=True, blank=True)
+    photo = models.ImageField(upload_to="devices/", null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
@@ -20,7 +21,7 @@ class Device(models.Model):
 
 class Room(models.Model):
     name = models.CharField(max_length=100)
-    devices = models.ManyToManyField(Device, related_name="rooms", null=True, blank=True)
+    devices = models.ManyToManyField(Device, related_name="rooms", blank=True)
 
     def __str__(self):
         return self.name
