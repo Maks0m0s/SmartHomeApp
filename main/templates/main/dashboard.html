@@ -28,7 +28,7 @@
            style="transition:.2s;{% if active_tab == 'state' %}background:rgba(59,130,246,.2);color:var(--primary);{% else %}background:transparent;color:var(--muted);{% endif %}">
           <i class="bi bi-activity me-2"></i>State
         </a>
-        {% if user.is_authenticated and user.is_staff %}
+        {% if user.is_authenticated and user.is_staff and user.is_superuser %}
         <a href="/admin/main/device/add/"
            class="btn btn-outline-primary d-flex align-items-center justify-content-center flex-shrink-0 px-3 py-3 rounded-3 border-0 fw-semibold"
            style="background:transparent;color:var(--primary);gap:6px;">
@@ -112,17 +112,32 @@
             {% for u in users %}
             <a href="{% url 'user-detail' u.id %}"
                class="user-card selectable-card rounded-3 p-3 {% if selected_user and selected_user.id == u.id %}selected{% endif %}"
-               style="cursor:pointer;transition:.2s;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);text-decoration:none;color:inherit;">
+               style="cursor:pointer;transition:.2s;border:1px solid rgba(255,255,255,.06);text-decoration:none;color:inherit;{% if u.id == user.id %}background:rgba(34,197,94,.08);border-color:rgba(34,197,94,.25);{% elif u.is_superuser or u.is_staff %}background:rgba(59,130,246,.06);border-color:rgba(59,130,246,.2);{% else %}background:rgba(239,68,68,.06);border-color:rgba(239,68,68,.2);{% endif %}">
               <div class="d-flex align-items-center gap-3">
-                <div class="d-flex align-items-center justify-content-center rounded-2 flex-shrink-0"
+                <div class="d-flex align-items-center justify-content-center rounded-2 flex-shrink-0 position-relative"
                      style="width:44px;height:44px;background:rgba(99,102,241,.15);">
-                  <i class="bi bi-person-circle text-primary" style="font-size:1.2rem;"></i>
+                  {% if u.id == user.id %}
+                    <i class="bi bi-person-circle text-primary" style="font-size:1.2rem;"></i>
+                    <span class="position-absolute rounded-circle" style="width:10px;height:10px;background:#22c55e;border:2px solid var(--bg);bottom:-2px;right:-2px;"></span>
+                  {% elif u.is_superuser or u.is_staff %}
+                    <i class="bi bi-person-circle text-primary" style="font-size:1.2rem;"></i>
+                  {% else %}
+                    <i class="bi bi-question-circle text-danger" style="font-size:1.2rem;"></i>
+                  {% endif %}
                 </div>
-                <div>
-                  <div class="fw-semibold">{{ u.get_full_name|default:u.username }}</div>
-                  <small class="text-body-secondary">{{ u.devices.count }} devices</small>
+                <div class="min-w-0">
+                  <div class="fw-semibold d-flex align-items-center gap-2">
+                    <span class="text-truncate">{{ u.get_full_name|default:u.username }}</span>
+                    {% if u.id == user.id %}
+                      <span class="badge bg-success bg-opacity-15 text-success flex-shrink-0" style="font-size:.65rem;">you</span>
+                    {% endif %}
+                    {% if u.is_superuser %}
+                      <i class="bi bi-gear-fill text-primary flex-shrink-0" style="font-size:.75rem;"></i>
+                    {% endif %}
+                  </div>
+                  <small class="text-body-secondary">{{ u.devices.count }} device{{ u.devices.count|pluralize }}</small>
                 </div>
-                <i class="bi bi-chevron-right ms-auto text-body-secondary"></i>
+                <i class="bi bi-chevron-right ms-auto text-body-secondary flex-shrink-0"></i>
               </div>
             </a>
             {% empty %}
@@ -189,7 +204,7 @@
           <span class="badge bg-primary bg-opacity-10 text-primary px-3 py-2">
             {{ devices|length }} device{{ devices|length|pluralize }}
           </span>
-          {% if user.is_authenticated and user.is_staff %}
+          {% if user.is_authenticated and user.is_superuser and user.is_staff %}
             <a href="/admin/main/device/" class="btn btn-outline-primary d-flex align-items-center gap-1 rounded-2 py-2 px-3">
             <i class="bi bi-gear"></i> <span class="d-none d-sm-inline">Manage</span>
             </a>
@@ -237,8 +252,8 @@
                 {% endif %}
 
                 <div class="mt-auto w-100 d-flex gap-2">
-                  {% if user.is_authenticated and user.is_staff %}
-                    {% if device.is_active %}
+                  {% if user.is_authenticated and user.is_staff or user.is_superuser %}
+                    {% if device.is_active and user.is_staff or user.is_superuser %}
                     <button type="button"
                             class="connect-btn btn btn-outline-primary flex-fill btn-sm rounded-2 py-2"
                             data-url="http://{{ device.ip_address }}:{{ device.port }}">
@@ -250,10 +265,16 @@
                       <i class="bi bi-box-arrow-up-right me-1"></i>Connect
                     </button>
                     {% endif %}
-                    <a href="/admin/main/device/{{ device.id }}/change/"
-                       class="btn btn-outline-primary flex-fill btn-sm rounded-2 py-2">
-                      <i class="bi bi-gear me-1"></i>Manage
-                    </a>
+                    {% if user.is_superuser and user.is_staff %}
+                      <a href="/admin/main/device/{{ device.id }}/change/"
+                         class="btn btn-outline-primary flex-fill btn-sm rounded-2 py-2">
+                        <i class="bi bi-gear me-1"></i>Manage
+                      </a>
+                    {% else %}
+                      <button class="btn btn-outline-secondary flex-fill btn-sm rounded-2 py-2" disabled
+                            data-bs-toggle="tooltip" title="Sign in to manage"><i class="bi bi-gear me-1"></i>Manage
+                      </button>
+                    {% endif %}
                   {% else %}
                     <button class="btn btn-outline-secondary flex-fill btn-sm rounded-2 py-2" disabled
                             data-bs-toggle="tooltip" title="Sign in to connect">

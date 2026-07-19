@@ -105,29 +105,24 @@
 <nav class="navbar navbar-expand-lg navbar-dark sticky-top">
     <div class="container">
 
-        <a class="navbar-brand" href="/">
-            <i class="bi bi-house-heart-fill me-2"></i>
-            SmartHomeApp
-        </a>
-
         <button class="navbar-toggler"
                 data-bs-toggle="collapse"
                 data-bs-target="#navbar">
             <span class="navbar-toggler-icon"></span>
         </button>
 
+        <a class="navbar-brand ms-auto ms-lg-0" href="/">
+            <i class="bi bi-house-heart-fill me-2"></i>
+            SmartHomeApp
+        </a>
+
         <div id="navbar" class="collapse navbar-collapse">
-
             <ul class="navbar-nav ms-auto align-items-lg-center gap-lg-1">
-
                 <li class="nav-item">
                     <a class="nav-link" href="{% url 'home' %}#features">Features</a>
                 </li>
-
                 <li class="nav-item">
-                    <a class="nav-link" href="{% url 'dashboard' %}">
-                        Dashboard
-                    </a>
+                    <a class="nav-link" href="{% url 'dashboard' %}">Dashboard</a>
                 </li>
 
                 {% if user.is_authenticated %}
@@ -138,7 +133,7 @@
                               style="width:32px;height:32px;background:rgba(59,130,246,.2);font-size:.8rem;">
                             <i class="bi bi-person-fill text-primary"></i>
                         </span>
-                        <span class="d-none d-lg-inline">{{ user.username }}</span>
+                        <span>{{ user.username }}</span>
                     </a>
                     <ul class="dropdown-menu dropdown-menu-end dropdown-menu-dark glass border-0 mt-2 p-2">
                         <li>
@@ -160,9 +155,7 @@
                     </a>
                 </li>
                 {% endif %}
-
             </ul>
-
         </div>
 
     </div>
