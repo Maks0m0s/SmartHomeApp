@@ -12,6 +12,7 @@ from main.api.dashboard_views import (
     StateDetailView,
 )
 from main.api.auth_views import AuthViewSet
+from main.api.profile_views import ProfileView
 
 router = DefaultRouter()
 
@@ -22,6 +23,7 @@ urlpatterns = [
     path('register/', AuthViewSet.as_view({'get': 'register', 'post': 'register'}), name='register'),
     path('logout/', AuthViewSet.as_view({'get': 'logout'}), name='logout'),
     path('delete/', AuthViewSet.as_view({'post': 'delete'}), name='delete'),
+    path('update/', AuthViewSet.as_view({'get': 'update', 'post': 'update'}), name='update-account'),
 
     path('dashboard/', DashboardView.as_view({'get': 'list'}), name='dashboard'),
 
@@ -35,6 +37,8 @@ urlpatterns = [
     path('dashboard/states/', StateDetailView.as_view({'get': 'list'}), name='states-list'),
     path('dashboard/state/<str:state>/', StateDetailView.as_view({'get': 'retrieve'}), name='state-detail'),
 
+    path('profile/', ProfileView.as_view({'get':'list'}), name='profile'),
+    path('<str:username>/', ProfileView.as_view({'get':'user_profile'}), name='user-profile'),
     path('api/', include(router.urls)),
 ]
 

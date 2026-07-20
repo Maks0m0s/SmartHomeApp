@@ -196,10 +196,17 @@
 
       <!-- Panel Header -->
       <div class="glass p-3 mb-3 d-flex align-items-center justify-content-between flex-shrink-0">
-        <div>
-          <h5 class="fw-bold mb-0">{{ panel_title|safe }}</h5>
-          <small class="text-body-secondary">{{ panel_subtitle }}</small>
-        </div>
+        {% if panel_is_user_profile %}
+          <a href="{% url 'user-profile' selected_user.username %}" class="text-decoration-none">
+            <h5 class="fw-bold mb-0">{{ panel_title|safe }}</h5>
+            <small class="text-body-secondary">{{ panel_subtitle }}</small>
+          </a>
+        {% else %}
+          <div>
+            <h5 class="fw-bold mb-0">{{ panel_title|safe }}</h5>
+            <small class="text-body-secondary">{{ panel_subtitle }}</small>
+          </div>
+        {% endif %}
         <div class="d-flex align-items-center gap-2">
           <span class="badge bg-primary bg-opacity-10 text-primary px-3 py-2">
             {{ devices|length }} device{{ devices|length|pluralize }}

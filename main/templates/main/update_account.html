@@ -1,0 +1,118 @@
+{% extends "main/base.html" %}
+
+{% block title %}Update Account{% endblock %}
+
+{% block content %}
+<div class="container py-5" style="max-width:900px;">
+
+    <!-- PROFILE CARD -->
+    <div class="card shadow-sm border-0 rounded-4 p-4 p-md-5 mb-4" style="background:var(--card);">
+
+        <div class="d-flex align-items-center gap-4 mb-4">
+            <!-- Avatar -->
+            <div class="d-flex align-items-center justify-content-center flex-shrink-0 position-relative"
+                 style="width:80px;height:80px;border-radius:50%;background:linear-gradient(135deg,#3b82f6,#1d4ed8);">
+                {% if profile_user.is_superuser %}
+                    <i class="bi bi-gear-fill text-white" style="font-size:2rem;"></i>
+                {% elif profile_user.is_staff %}
+                    <i class="bi bi-person-fill text-white" style="font-size:2rem;"></i>
+                {% else %}
+                    <i class="bi bi-question-circle text-white" style="font-size:2rem;"></i>
+                {% endif %}
+                <span class="position-absolute rounded-circle"
+                      style="width:14px;height:14px;background:#22c55e;border:3px solid var(--card);bottom:2px;right:2px;"></span>
+            </div>
+
+            <div class="min-w-0">
+                <h3 class="fw-bold mb-1 text-truncate">{{ profile_user.username }}</h3>
+                <p class="text-body-secondary mb-1">{{ profile_user.email|default:"No email set" }}</p>
+                {% if profile_user.is_superuser %}
+                    <span class="badge rounded-pill" style="background:rgba(59,130,246,.15);color:#60a5fa;">
+                        <i class="bi bi-gear-fill me-1"></i>Superuser
+                    </span>
+                {% elif profile_user.is_staff %}
+                    <span class="badge rounded-pill" style="background:rgba(59,130,246,.15);color:#60a5fa;">
+                        <i class="bi bi-person-fill me-1"></i>Authorized user
+                    </span>
+                {% else %}
+                    <span class="badge rounded-pill" style="background:rgba(239,68,68,.12);color:#f87171;">
+                        <i class="bi bi-question-circle me-1"></i>Not-authorized user
+                    </span>
+                {% endif %}
+            </div>
+        </div>
+
+        <hr style="border-color:rgba(255,255,255,.08);">
+
+        {% if error %}
+            <div class="alert alert-danger rounded-3 mb-4" style="background:rgba(239,68,68,.12);border:1px solid rgba(239,68,68,.2);color:#f87171;">
+                <i class="bi bi-exclamation-triangle me-2"></i>{{ error }}
+            </div>
+        {% endif %}
+
+        <form method="post" action="{% url 'update-account' %}">
+            {% csrf_token %}
+
+            <div class="row g-4">
+                <div class="col-sm-6">
+                    <label class="form-label" style="font-size:.75rem;text-transform:uppercase;letter-spacing:.5px;color:var(--muted);">Username</label>
+                    <input type="text" name="username" class="form-control rounded-3"
+                           value="{{ profile_user.username }}"
+                           style="background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.08);color:var(--text);" required>
+                </div>
+                <div class="col-sm-6">
+                    <label class="form-label" style="font-size:.75rem;text-transform:uppercase;letter-spacing:.5px;color:var(--muted);">Email</label>
+                    <input type="email" name="email" class="form-control rounded-3"
+                           value="{{ profile_user.email }}"
+                           style="background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.08);color:var(--text);" required>
+                </div>
+                <div class="col-sm-6">
+                    <label class="form-label" style="font-size:.75rem;text-transform:uppercase;letter-spacing:.5px;color:var(--muted);">First Name</label>
+                    <input type="text" name="first_name" class="form-control rounded-3"
+                           value="{{ profile_user.first_name }}"
+                           style="background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.08);color:var(--text);">
+                </div>
+                <div class="col-sm-6">
+                    <label class="form-label" style="font-size:.75rem;text-transform:uppercase;letter-spacing:.5px;color:var(--muted);">Last Name</label>
+                    <input type="text" name="last_name" class="form-control rounded-3"
+                           value="{{ profile_user.last_name }}"
+                           style="background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.08);color:var(--text);">
+                </div>
+                <div class="col-12">
+                    <hr style="border-color:rgba(255,255,255,.08);">
+                </div>
+                <div class="col-sm-6">
+                    <label class="form-label" style="font-size:.75rem;text-transform:uppercase;letter-spacing:.5px;color:var(--muted);">Current Password</label>
+                    <input type="password" name="current_password" class="form-control rounded-3"
+                           placeholder="Required to save changes"
+                           style="background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.08);color:var(--text);" required>
+                </div>
+                <div class="col-sm-6">
+                    <label class="form-label" style="font-size:.75rem;text-transform:uppercase;letter-spacing:.5px;color:var(--muted);">New Password</label>
+                    <input type="password" name="new_password" class="form-control rounded-3"
+                           placeholder="Leave blank to keep current"
+                           style="background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.08);color:var(--text);">
+                </div>
+            </div>
+
+            <!-- Actions -->
+            <hr style="border-color:rgba(255,255,255,.08);">
+
+            <div class="d-flex flex-wrap justify-content-between gap-3">
+                <a href="{% url 'profile' %}"
+                   class="btn rounded-pill px-4"
+                   style="background:rgba(148,163,184,.1);color:var(--muted);border:1px solid rgba(148,163,184,.15);">
+                    <i class="bi bi-arrow-left me-1"></i>Back
+                </a>
+
+                <button type="submit"
+                        class="btn rounded-pill px-4"
+                        style="background:rgba(34,197,94,.12);color:#4ade80;border:1px solid rgba(34,197,94,.2);">
+                    <i class="bi bi-check-lg me-1"></i>Save
+                </button>
+            </div>
+        </form>
+    </div>
+
+</div>
+{% endblock %}

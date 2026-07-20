@@ -62,3 +62,20 @@ class AuthViewSet(viewsets.ViewSet):
         response = redirect('home')
         delete_account(request)
         return response
+
+    @action(detail=False, methods=['get', 'post'], url_path='update')
+    def update(self, request):
+        if not request.user.is_authenticated:
+            return redirect('login')
+
+        error = None
+        if request.method == 'POST':
+            result = update_account(request)
+            if result['result']:
+                return redirect('profile')
+            error = result['error']
+
+        return Response(
+            {"profile_user": request.user, "error": error},
+            template_name='main/update_account.html'
+        )

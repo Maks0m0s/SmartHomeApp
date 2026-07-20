@@ -1,0 +1,109 @@
+{% extends "main/base.html" %}
+
+{% block title %}My Profile{% endblock %}
+
+{% block content %}
+<div class="container py-5" style="max-width:900px;">
+
+    <!-- PROFILE CARD -->
+    <div class="card shadow-sm border-0 rounded-4 p-4 p-md-5 mb-4" style="background:var(--card);">
+
+        <div class="d-flex align-items-center gap-4 mb-4">
+            <!-- Avatar -->
+            <div class="d-flex align-items-center justify-content-center flex-shrink-0 position-relative"
+                 style="width:80px;height:80px;border-radius:50%;background:linear-gradient(135deg,#3b82f6,#1d4ed8);">
+                {% if profile_user.is_superuser %}
+                    <i class="bi bi-gear-fill text-white" style="font-size:2rem;"></i>
+                {% elif profile_user.is_staff %}
+                    <i class="bi bi-person-fill text-white" style="font-size:2rem;"></i>
+                {% else %}
+                    <i class="bi bi-question-circle text-white" style="font-size:2rem;"></i>
+                {% endif %}
+                <span class="position-absolute rounded-circle"
+                      style="width:14px;height:14px;background:#22c55e;border:3px solid var(--card);bottom:2px;right:2px;"></span>
+            </div>
+
+            <div class="min-w-0">
+                <h3 class="fw-bold mb-1 text-truncate">{{ profile_user.username }}</h3>
+                <p class="text-body-secondary mb-1">{{ profile_user.email|default:"No email set" }}</p>
+                <!-- Status badge -->
+                {% if profile_user.is_superuser %}
+                    <span class="badge rounded-pill" style="background:rgba(59,130,246,.15);color:#60a5fa;">
+                        <i class="bi bi-gear-fill me-1"></i>Superuser
+                    </span>
+                {% elif profile_user.is_staff %}
+                    <span class="badge rounded-pill" style="background:rgba(59,130,246,.15);color:#60a5fa;">
+                        <i class="bi bi-person-fill me-1"></i>Authorized user
+                    </span>
+                {% else %}
+                    <span class="badge rounded-pill" style="background:rgba(239,68,68,.12);color:#f87171;">
+                        <i class="bi bi-question-circle me-1"></i>Not-authorized user
+                    </span>
+                {% endif %}
+            </div>
+        </div>
+
+        <hr style="border-color:rgba(255,255,255,.08);">
+
+        <!-- Info grid -->
+        <div class="row g-4 mt-1">
+            <div class="col-sm-6">
+                <h6 class="text-body-secondary mb-1" style="font-size:.75rem;text-transform:uppercase;letter-spacing:.5px;">First Name</h6>
+                <p class="fw-semibold mb-0">{{ profile_user.first_name|default:"—" }}</p>
+            </div>
+            <div class="col-sm-6">
+                <h6 class="text-body-secondary mb-1" style="font-size:.75rem;text-transform:uppercase;letter-spacing:.5px;">Last Name</h6>
+                <p class="fw-semibold mb-0">{{ profile_user.last_name|default:"—" }}</p>
+            </div>
+            <div class="col-sm-6">
+                <h6 class="text-body-secondary mb-1" style="font-size:.75rem;text-transform:uppercase;letter-spacing:.5px;">Email</h6>
+                <p class="fw-semibold mb-0">{{ profile_user.email|default:"—" }}</p>
+            </div>
+            <div class="col-sm-6">
+                <h6 class="text-body-secondary mb-1" style="font-size:.75rem;text-transform:uppercase;letter-spacing:.5px;">Registered</h6>
+                <p class="fw-semibold mb-0">{{ profile_user.date_joined|date:"d M Y" }}</p>
+            </div>
+            <div class="col-sm-6">
+                <h6 class="text-body-secondary mb-1" style="font-size:.75rem;text-transform:uppercase;letter-spacing:.5px;">Devices</h6>
+                <p class="fw-semibold mb-0">{{ device_count }}</p>
+            </div>
+        </div>
+
+        <!-- Actions -->
+        <hr style="border-color:rgba(255,255,255,.08);">
+
+        <div class="d-flex flex-wrap justify-content-between gap-3">
+            <div class="d-flex gap-2">
+                <a href="{% url 'user-detail' profile_user.id %}"
+                   class="btn rounded-pill px-4"
+                   style="background:rgba(59,130,246,.15);color:#60a5fa;border:1px solid rgba(59,130,246,.25);">
+                    <i class="bi bi-speedometer2 me-1"></i>Dashboard
+                </a>
+                <a href="{% url 'update-account' %}"
+                   class="btn rounded-pill px-4"
+                   style="background:rgba(251,191,36,.12);color:#fbbf24;border:1px solid rgba(251,191,36,.2);">
+                    <i class="bi bi-pencil-square me-1"></i>Modify
+                </a>
+            </div>
+
+            <div class="d-flex gap-2">
+                <a href="{% url 'logout' %}"
+                   class="btn rounded-pill px-4"
+                   style="background:rgba(148,163,184,.1);color:var(--muted);border:1px solid rgba(148,163,184,.15);">
+                    <i class="bi bi-box-arrow-right me-1"></i>Sign Out
+                </a>
+                <form method="post" action="{% url 'delete' %}" class="d-inline"
+                      onsubmit="return confirm('Delete your account? This cannot be undone.');">
+                    {% csrf_token %}
+                    <button type="submit"
+                            class="btn rounded-pill px-4"
+                            style="background:rgba(239,68,68,.12);color:#f87171;border:1px solid rgba(239,68,68,.2);">
+                        <i class="bi bi-trash3 me-1"></i>Delete
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+</div>
+{% endblock %}

@@ -108,6 +108,7 @@ class UserDetailView(viewsets.ViewSet):
         display_name = user_obj.get_full_name() or user_obj.username
         ctx["panel_title"] = '<i class="bi bi-person me-2"></i>' + display_name
         ctx["panel_subtitle"] = "Devices owned by " + display_name
+        ctx["panel_is_user_profile"] = True
         return Response(ctx)
 
 
