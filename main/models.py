@@ -7,6 +7,8 @@ class Device(models.Model):
     port = models.PositiveIntegerField(default=80)
     description = models.TextField(blank=True)
     is_active = models.BooleanField(default=True)
+    is_private = models.BooleanField(default=False)
+    is_semiprivate = models.BooleanField(default=False)
     creator = models.ForeignKey(User,  related_name="devices", on_delete=models.CASCADE, null=True, blank=True)
     photo = models.ImageField(upload_to="devices/", null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)

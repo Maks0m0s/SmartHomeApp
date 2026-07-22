@@ -1,10 +1,23 @@
 from django.contrib.auth.models import User
+from django.db.models import Q
 from django.shortcuts import get_object_or_404
 from rest_framework import viewsets, permissions
 from rest_framework.response import Response
 from rest_framework.renderers import TemplateHTMLRenderer
 from main.models import Device, Category, Floor, Room
 
+
+def visible_devices(user):
+    qs = Device.objects.all()
+    if not user.is_authenticated:
+        return qs.filter(is_private=False, is_semiprivate=False)
+    if not user.is_staff and not user.is_superuser:
+        return qs.filter(is_private=False, is_semiprivate=False)
+    return qs.filter(
+        Q(is_private=False, is_semiprivate=False)
+        | Q(is_semiprivate=True)
+        | Q(is_private=True, creator=user)
+    )
 
 def _base_context():
     return {
@@ -33,7 +46,7 @@ class DashboardView(viewsets.ViewSet):
 
     def list(self, request):
         ctx = _base_context()
-        ctx["devices"] = Device.objects.all()
+        ctx["devices"] = visible_devices(request.user)
         ctx["panel_subtitle"] = "All registered devices"
         return Response(ctx)
 
@@ -54,7 +67,7 @@ class FloorDetailView(viewsets.ViewSet):
         ctx["selected_category"] = "floors"
         ctx["selected_floor"] = floor
         ctx["rooms"] = floor.rooms.all()
-        ctx["devices"] = Device.objects.filter(rooms__in=floor.rooms.all()).distinct()
+        ctx["devices"] = visible_devices(request.user).filter(rooms__in=floor.rooms.all()).distinct()
         ctx["panel_title"] = '<i class="bi bi-building me-2"></i>' + floor.name
         ctx["panel_subtitle"] = "All devices in " + floor.name
         return Response(ctx)
@@ -81,7 +94,7 @@ class RoomDetailView(viewsets.ViewSet):
         ctx["selected_floor"] = floor
         ctx["selected_room"] = room
         ctx["rooms"] = floor.rooms.all()
-        ctx["devices"] = room.devices.all()
+        ctx["devices"] = visible_devices(request.user).filter(rooms=room)
         ctx["panel_title"] = '<i class="bi bi-door-open me-2"></i>' + room.name
         ctx["panel_subtitle"] = "Devices in " + room.name
         return Response(ctx)
@@ -104,7 +117,7 @@ class UserDetailView(viewsets.ViewSet):
         ctx["active_tab"] = "person"
         ctx["selected_category"] = "person"
         ctx["selected_user"] = user_obj
-        ctx["devices"] = Device.objects.filter(creator=user_obj)
+        ctx["devices"] = visible_devices(request.user).filter(creator=user_obj)
         display_name = user_obj.get_full_name() or user_obj.username
         ctx["panel_title"] = '<i class="bi bi-person me-2"></i>' + display_name
         ctx["panel_subtitle"] = "Devices owned by " + display_name
@@ -129,11 +142,11 @@ class StateDetailView(viewsets.ViewSet):
         ctx["selected_state"] = state
         ctx["active_tab"] = "state"
         if state == "active":
-            ctx["devices"] = Device.objects.filter(is_active=True)
+            ctx["devices"] = visible_devices(request.user).filter(is_active=True)
             ctx["panel_title"] = '<i class="bi bi-check-circle me-2"></i>Active'
             ctx["panel_subtitle"] = "All active devices"
         elif state == "stopped":
-            ctx["devices"] = Device.objects.filter(is_active=False)
+            ctx["devices"] = visible_devices(request.user).filter(is_active=False)
             ctx["panel_title"] = '<i class="bi bi-x-circle me-2"></i>Stopped'
             ctx["panel_subtitle"] = "All stopped devices"
         else:

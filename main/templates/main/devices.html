@@ -58,6 +58,15 @@
                 <span class="d-none d-sm-inline">Stopped</span>
               </span>
             {% endif %}
+            {% if device.is_private %}
+              <span class="badge bg-warning bg-opacity-10 text-warning px-2 px-md-3 py-2 flex-shrink-0">
+                <i class="bi bi-lock-fill me-1" style="font-size:.6rem;"></i>Private
+              </span>
+            {% elif device.is_semiprivate %}
+              <span class="badge bg-info bg-opacity-10 text-info px-2 px-md-3 py-2 flex-shrink-0">
+                <i class="bi bi-shield-lock me-1" style="font-size:.6rem;"></i>Semi-Private
+              </span>
+            {% endif %}
           </div>
           {% if device.description %}
             <p class="text-body-secondary mb-3" style="font-size:.8rem;padding-left:52px;">
@@ -66,11 +75,18 @@
           {% endif %}
 
           <div class="mt-3" style="padding-left:52px;">
-            <button type="button"
-                    class="connect-btn btn btn-outline-primary btn-sm"
-                    data-url="http://{{ device.ip_address }}:{{ device.port }}">
-              <i class="bi bi-box-arrow-up-right me-1"></i>Connect to device
-            </button>
+            {% if device.is_private and device.creator != user %}
+              <button class="btn btn-outline-secondary btn-sm" disabled
+                      data-bs-toggle="tooltip" title="Only the creator can access this device">
+                <i class="bi bi-box-arrow-up-right me-1"></i>Connect to device
+              </button>
+            {% else %}
+              <button type="button"
+                      class="connect-btn btn btn-outline-primary btn-sm"
+                      data-url="http://{{ device.ip_address }}:{{ device.port }}">
+                <i class="bi bi-box-arrow-up-right me-1"></i>Connect to device
+              </button>
+            {% endif %}
           </div>
 
         </div>

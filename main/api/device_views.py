@@ -6,6 +6,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.renderers import TemplateHTMLRenderer
 from main.models import Device
+from main.api.dashboard_views import visible_devices
 
 class DeviceDashboardView(viewsets.ViewSet):
     permission_classes = [permissions.AllowAny]
@@ -13,7 +14,7 @@ class DeviceDashboardView(viewsets.ViewSet):
     template_name = "main/devices.html"
 
     def list(self, request):
-        devices = Device.objects.all()
+        devices = visible_devices(request.user)
         context = {"devices": devices}
 
         return Response(context)
